@@ -93,9 +93,7 @@ def convert_title(title, filename, image_index, the_time, char_limit=0):
     title = re.sub(r'[\\/:*?"<>|]+', '_', title)
     # 長い場合は省略。
     if char_limit > 0:
-        title = truncate(title, char_limit - 4, "[...]") + ext
-    else:
-        title += ext
+        title = truncate(title, char_limit - 4, "[...]")
     return title
 
 def try_int(value, field, another_value = "\x7F"):
@@ -123,13 +121,16 @@ class WaganaApplication(ttk.Frame):
         self.page_title_align_default = "中央揃え"
         self.page_size_list = [NOSPEC, "A4", "A3", "A2", "B5", "B4", "B3"]
         self.page_size_default = NOSPEC
+        self.image_title_list = [NOSPEC, "画像 #%N", "%F", "(%N) %F", "%Y年%m月%d日", "%Y年%m月%d日 %H時%M分", "%Y-%m-%d", "%Y-%m-%d %H:%M"]
         self.image_title_default = "(%N) %F"
-        self.output_name_default = "写真一覧-%Y.%m.%d"
+        self.file_title_list = ["写真一覧", "写真一覧(%Y年%m月%d日)", "私のアルバム(%Y年%m月%d日)", "実験結果-%Y-%m-%d", "押収品-%Y年%m月%d日"]
+        self.file_title_default = "写真一覧"
         self.datetime_type_list = ["撮影日時", "画像作成日時", "画像更新日時", "ワード生成日時"]
         self.datetime_type_default = "ワード生成日時"
         self.auto_rotation_default = '1'
+        self.button_advanced_hidden = False
     def __init__(self, root):
-        super().__init__(root, width='620', height='460')
+        super().__init__(root)
         self.image_ext_list = [".jpg", ".jpeg", ".jpe", ".jfif", ".png", ".gif", ".tif", ".tiff",
                                ".bmp", ".dib"]
         # リストと規定値。
@@ -191,13 +192,14 @@ class WaganaApplication(ttk.Frame):
         self.after_idle(self.drop_check)
     # リストボックスの選択が変わった。
     def listbox_on_sel_change(self, evt=None):
+        self.label_22.config(text="")
         selection = self.listbox_01.curselection()
         if len(selection) <= 0:
-            self.button_03.config(state="disabled")
+            self.button_04.config(state="disabled")
             self.label_18.image = None
             self.label_18["image"] = None
             return
-        self.button_03.config(state="normal")
+        self.button_04.config(state="normal")
         filename = self.listbox_01.get(selection[0])
         picture_filename = self.process_image(filename, 50, 50)
         from PIL import Image, ImageTk
@@ -206,104 +208,154 @@ class WaganaApplication(ttk.Frame):
         img = ImageTk.PhotoImage(img);
         self.label_18.image = img
         self.label_18["image"] = img
+        the_time = self.get_datetime(filename)
+        self.image_title_default = self.image_title.get()
+        text = convert_title(self.image_title_default, filename, selection[0], the_time)
+        self.label_22.config(text=("画像タイトル「" + text + "」"))
         if filename != picture_filename:
             os.remove(picture_filename)
+    # リストボックスの選択が変わった。
+    def combobox_on_sel_change(self, evt=None):
+        self.listbox_on_sel_change()
     # ウィジェットをすべて作成。
     def create_widgets(self):
-        self.label_06 = ttk.Label(self, text="ページサイズ:", width="", state="normal", )
-        self.label_06.place(x=20, y=20)
+        self.group2 = tk.Frame(self)
+
+        row = 0
+
+        self.label_06 = ttk.Label(self.group2, text="ページサイズ:", width="", state="normal", )
+        self.label_06.grid(column=0, row=row, pady=2, sticky=tk.E)
         self.page_size = tk.StringVar()
-        self.combobox_06 = ttk.Combobox(self, height="10", state="readonly", width="25", values=self.page_size_list, textvariable=self.page_size)
-        self.combobox_06.place(x=130, y=20)
+        self.combobox_06 = ttk.Combobox(self.group2, height="10", state="readonly", width="25", values=self.page_size_list, textvariable=self.page_size)
+        self.combobox_06.grid(column=1, row=row, pady=2)
         self.combobox_06.set(self.page_size_default)
+        row += 1
 
-        self.label_01 = ttk.Label(self, text="用紙の向き:", width="", state="normal", )
-        self.label_01.place(x=20, y=50)
+        self.label_01 = ttk.Label(self.group2, text="用紙の向き:", width="", state="normal", )
+        self.label_01.grid(column=0, row=row, pady=2, sticky=tk.E)
         self.muki = tk.StringVar()
-        self.combobox_01 = ttk.Combobox(self, height="10", state="readonly", width="25", values=self.muki_list, textvariable=self.muki)
-        self.combobox_01.place(x=130, y=50)
+        self.combobox_01 = ttk.Combobox(self.group2, height="10", state="readonly", width="25", values=self.muki_list, textvariable=self.muki)
+        self.combobox_01.grid(column=1, row=row, pady=2)
         self.combobox_01.set(self.muki_default)
+        row += 1
 
-        self.label_02 = ttk.Label(self, text="ページのタテ割り:", width="", state="normal", )
-        self.label_02.place(x=20, y=80)
+        self.label_02 = ttk.Label(self.group2, text="ページのタテ割り:", width="", state="normal", )
+        self.label_02.grid(column=0, row=row, pady=2, sticky=tk.E)
         self.gyousuu = tk.StringVar()
-        self.combobox_02 = ttk.Combobox(self, height="10", state="normal", width="25", values=self.gyousuu_list, textvariable=self.gyousuu)
-        self.combobox_02.place(x=130, y=80)
+        self.combobox_02 = ttk.Combobox(self.group2, height="10", state="normal", width="25", values=self.gyousuu_list, textvariable=self.gyousuu)
+        self.combobox_02.grid(column=1, row=row, pady=2)
         self.combobox_02.set(self.gyousuu_default)
+        row += 1
 
-        self.label_03 = ttk.Label(self, text="ページのヨコ割り:", width="", state="normal", )
-        self.label_03.place(x=20, y=110)
+        self.label_03 = ttk.Label(self.group2, text="ページのヨコ割り:", width="", state="normal", )
+        self.label_03.grid(column=0, row=row, pady=2, sticky=tk.E)
         self.retsusuu = tk.StringVar()
-        self.combobox_03 = ttk.Combobox(self, height="10", state="normal", width="25", values=self.retsusuu_list, textvariable=self.retsusuu)
-        self.combobox_03.place(x=130, y=110)
+        self.combobox_03 = ttk.Combobox(self.group2, height="10", state="normal", width="25", values=self.retsusuu_list, textvariable=self.retsusuu)
+        self.combobox_03.grid(column=1, row=row, pady=2)
         self.combobox_03.set(self.retsusuu_default)
+        row += 1
 
-        self.label_17 = ttk.Label(self, text="日時の種類:", width="", state="normal", )
-        self.label_17.place(x=320, y=20)
+        row2 = 0
+        self.label_17 = ttk.Label(self.group2, text="日時の種類:", width="", state="normal", )
+        self.label_17.grid(column=2, row=row2, pady=2, sticky=tk.E)
         self.datetime_type = tk.StringVar()
-        self.combobox_14 = ttk.Combobox(self, height="10", state="readonly", width="25", values=self.datetime_type_list, textvariable=self.datetime_type)
-        self.combobox_14.place(x=420, y=20)
+        self.combobox_14 = ttk.Combobox(self.group2, height="10", state="readonly", width="25", values=self.datetime_type_list, textvariable=self.datetime_type)
+        self.combobox_14.grid(column=3, row=row2, pady=2)
         self.combobox_14.set(self.datetime_type_default)
+        self.combobox_14.bind('<<ComboboxSelected>>', self.combobox_on_sel_change)
+        row2 += 1
+
+        self.label_19 = ttk.Label(self.group2, text="画像タイトル:", width="", state="normal", )
+        self.label_19.grid(column=2, row=row2, pady=2, sticky=tk.E)
+        self.image_title = tk.StringVar()
+        self.combobox_15 = ttk.Combobox(self.group2, height="10", state="normal", width="25", values=self.image_title_list, textvariable=self.image_title)
+        self.combobox_15.grid(column=3, row=row2, pady=2)
+        self.combobox_15.set(self.image_title_default)
+        self.combobox_15.bind('<<ComboboxSelected>>', self.combobox_on_sel_change)
+        row2 += 1
+
+        self.label_20 = ttk.Label(self.group2, text="出力ファイル名:", width="", state="normal", )
+        self.label_20.grid(column=2, row=row2, pady=2, sticky=tk.E)
+        self.file_title = tk.StringVar()
+        self.combobox_16 = ttk.Combobox(self.group2, height="10", state="normal", width="25", values=self.file_title_list, textvariable=self.file_title)
+        self.combobox_16.grid(column=3, row=row2, pady=2)
+        self.combobox_16.set(self.file_title_default)
+        row2 += 1
 
         self.auto_rotation = tk.StringVar()
-        self.checkbox_01 = ttk.Checkbutton(self, text='余白が小さくなるように画像を回転', variable=self.auto_rotation)
-        self.checkbox_01.place(x=320, y=50, width=200)
+        self.checkbox_01 = ttk.Checkbutton(self.group2, text='余白が小さくなるように画像を回転', variable=self.auto_rotation)
+        self.checkbox_01.grid(column=2, row=row2, columnspan=2)
         self.auto_rotation.set(self.auto_rotation_default)
+        row2 += 1
 
-        self.button_06 = ttk.Button(self, command = self.commandResetSettings, text="設定リセット", width="", state="normal", )
-        self.button_06.place(x=510, y=110)
+        row += 1
 
-        self.label_16 = ttk.Label(self, text="並べる画像ファイルのリスト: (ここに順番にファイルをドロップして下さい)", width="300", state="normal", )
-        self.label_16.place(x=20, y=145)
+        self.group4 = tk.Frame(self.group2)
+        self.label_18 = ttk.Label(self.group4, width="50", state="normal", image="")
+        self.label_18.pack(side=tk.LEFT, fill=tk.Y, padx=16)
+        self.label_22 = ttk.Label(self.group4, width="", text="", state="normal")
+        self.label_22.pack(side=tk.LEFT, fill=tk.Y, padx=16)
+        self.label_21 = ttk.Label(self.group4, width="", text="全部で0個です。", state="normal")
+        self.label_21.pack(side=tk.LEFT, fill=tk.Y, padx=16)
 
-        self.total_number = tk.StringVar()
-        self.label_17 = ttk.Label(self, text="　", width="100", state="normal", textvariable=self.total_number)
-        self.label_17.place(x=380, y=145)
+        self.group4.grid(column=0, row=row, columnspan=4)
+        self.group2.rowconfigure(row, minsize=50)
+        row += 1
 
-        self.label_18 = ttk.Label(self, width="30", state="normal", image="")
-        self.label_18.place(x=320, y=80)
+        self.group1 = tk.Frame(self.group2)
+        self.group1.grid(column=0, row=row, columnspan=4)
+        row += 1
 
-        self.group1 = tk.Frame(self)
-        self.group1.place(x=20, y=170)
+        self.label_16 = ttk.Label(self.group1, text="並べる画像ファイルのリスト: (ここに順番にファイルをドロップして下さい)", width="", state="normal", )
+        self.label_16.pack(side=tk.TOP)
 
-        self.listbox_01 = tk.Listbox(self.group1, width=92, height=10, selectmode=tk.EXTENDED, activestyle='none')
+        self.listbox_01 = tk.Listbox(self.group1, width=92, height=10, selectmode=tk.EXTENDED, activestyle='none', exportselection=False)
         self.listbox_01.pack(side=tk.LEFT, fill=tk.Y)
         self.listbox_01.config(borderwidth=2)
-
         self.vscrollbar = tk.Scrollbar(self.group1, orient=tk.VERTICAL, command=self.listbox_01.yview)
         self.vscrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
         self.listbox_01.config(yscrollcommand = self.vscrollbar.set)
         self.listbox_01.bind('<<ListboxSelect>>', self.listbox_on_sel_change)
 
-        self.button_01 = ttk.Button(self, command = self.commandSaveList, text="リストの保存...", width="15", state="normal", )
-        self.button_01.place(x=20, y=350)
+        self.group3 = tk.Frame(self.group2)
+        self.group3.grid(column=0, row=row, columnspan=4, rowspan=1)
+        row += 1
 
-        self.button_02 = ttk.Button(self, command = self.commandMoveUp, text="↑", width="8", state="normal", )
-        self.button_02.place(x=140, y=350)
+        self.button_01 = ttk.Button(self.group3, command = self.commandSaveList, text="リストの保存...", width="15", state="normal", )
+        self.button_01.pack(side=tk.LEFT, padx=2)
 
-        self.button_03 = ttk.Button(self, command = self.commandMoveDown, text="↓", width="8", state="normal", )
-        self.button_03.place(x=200, y=350)
+        self.button_07 = ttk.Button(self.group3, command = self.commandResetSettings, text="設定のリセット", width="", state="normal", )
+        self.button_07.pack(side=tk.LEFT, padx=2)
 
-        self.button_03 = ttk.Button(self, command = self.commandDeleteItems, text="選択を削除", width="15", state="normal", )
-        self.button_03.place(x=280, y=350)
+        self.button_02 = ttk.Button(self.group3, command = self.commandMoveUp, text="↑", width="8", state="normal", )
+        self.button_02.pack(side=tk.LEFT, padx=2)
 
-        self.button_04 = ttk.Button(self, command = self.commandOK, text="ワード生成", width="", state="normal", )
-        self.button_04.place(x=410, y=350)
+        self.button_03 = ttk.Button(self.group3, command = self.commandMoveDown, text="↓", width="8", state="normal", )
+        self.button_03.pack(side=tk.LEFT, padx=2)
 
-        self.button_05 = ttk.Button(self, command = self.commandExit, text="終了", width="", state="normal", )
-        self.button_05.place(x=520, y=350)
+        self.button_04 = ttk.Button(self.group3, command = self.commandDeleteItems, text="選択を削除", width="15", state="normal", )
+        self.button_04.pack(side=tk.LEFT, padx=2)
+
+        self.button_05 = ttk.Button(self.group3, command = self.commandOK, text="ワード生成", width="", state="normal", )
+        self.button_05.pack(side=tk.LEFT, padx=2)
+
+        self.button_06 = ttk.Button(self.group3, command = self.commandExit, text="終了", width="", state="normal", )
+        self.button_06.pack(side=tk.LEFT, padx=2)
+
+        self.group2.columnconfigure(0, weight=1)
+        self.group2.columnconfigure(1, weight=1)
+        self.group2.columnconfigure(2, weight=1)
+        self.group2.columnconfigure(3, weight=1)
+        self.group2.pack()
 
         self.update_count()
     # 個数を更新。
     def update_count(self):
         if self.listbox_01.size() <= 0:
-            self.button_03.config(state="disabled")
-            self.total_number.set("")
-            self.listbox_on_sel_change()
+            self.button_04.config(state="disabled")
             return
-        self.total_number.set("全部で" + str(self.listbox_01.size()) + "個")
-        self.button_03.config(state="normal")
+        self.button_04.config(state="normal")
+        self.label_21.config(text=("全部で" + str(self.listbox_01.size()) + "個です。"))
         self.listbox_on_sel_change()
     # 挿入。
     def insert(self, filename):
@@ -336,7 +388,7 @@ class WaganaApplication(ttk.Frame):
             with open(filename, "w") as fp:
                 for item in items:
                     fp.write(item + "\n")
-            messagebox.showerror('ワガナ', "ファイル「" + filename + "」の保存に成功しました。\n\nファイルドロップで復元できます。")
+            messagebox.showinfo('ワガナ', "ファイル「" + filename + "」の保存に成功しました。\n\nファイルドロップで復元できます。")
         except:
             messagebox.showerror('ワガナ', "ファイル「" + filename + "」の保存に失敗しました。")
     # 「選択を削除」ボタンを押した。
@@ -364,6 +416,7 @@ class WaganaApplication(ttk.Frame):
             self.listbox_01.selection_clear(item)
         for item in items:
             self.listbox_01.selection_set(item - 1)
+        self.listbox_on_sel_change()
     # 「↓」ボタンを押した。
     def commandMoveDown(self):
         if self.listbox_01.size() == 0:
@@ -384,6 +437,7 @@ class WaganaApplication(ttk.Frame):
             self.listbox_01.selection_clear(item)
         for item in items:
             self.listbox_01.selection_set(item + 1)
+        self.listbox_on_sel_change()
     # リストボックスからファイルのリストを取得する。
     def get_file_list(self):
         file_list = []
@@ -433,6 +487,33 @@ class WaganaApplication(ttk.Frame):
             new_image = image.resize((image.width // 2, image.height // 2))
             new_image.save(picture_filename)
         return picture_filename
+    # 日時を取得する。
+    def get_datetime(self, filename):
+        the_time = None
+        self.datetime_type_default = self.datetime_type.get()
+        # 日時文字列の処理。
+        if self.datetime_type_default == "撮影日時":
+            try:
+                from PIL import Image
+                s = Image.open(filename)._getexif()[36867]
+                s = s.replace(":", "-", 2)
+                the_time = datetime.datetime.fromisoformat(s)
+                #print("EXIF: " + filename + " | " + str(the_time))
+            except:
+                timestamp = os.path.getctime(filename)
+                the_time = datetime.datetime.fromtimestamp(timestamp)
+                #print("non-EXIF: " + filename + " | " + str(the_time))
+        elif self.datetime_type_default == "画像作成日時":
+            timestamp = os.path.getctime(filename)
+            the_time = datetime.datetime.fromtimestamp(timestamp)
+        elif self.datetime_type_default == "画像更新日時":
+            timestamp = os.path.getmtime(filename)
+            the_time = datetime.datetime.fromtimestamp(timestamp)
+        elif self.datetime_type_default == "ワード生成日時":
+            the_time = datetime.datetime.now()
+        else:
+            the_time = datetime.datetime.now()
+        return the_time
     # docxファイルを生成する。
     def generate_docx(self):
         import docx
@@ -565,28 +646,8 @@ class WaganaApplication(ttk.Frame):
 
         for i in range(0, len(file_list)):
             filename = file_list[image_index]
-            # 日時文字列の処理。
-            if self.datetime_type_default == "撮影日時":
-                try:
-                    from PIL import Image
-                    s = Image.open(filename)._getexif()[36867]
-                    s = s.replace(":", "-", 2)
-                    the_time = datetime.datetime.fromisoformat(s)
-                    #print("EXIF: " + filename + " | " + str(the_time))
-                except:
-                    timestamp = os.path.getctime(filename)
-                    the_time = datetime.datetime.fromtimestamp(timestamp)
-                    #print("non-EXIF: " + filename + " | " + str(the_time))
-            elif self.datetime_type_default == "画像作成日時":
-                timestamp = os.path.getctime(filename)
-                the_time = datetime.datetime.fromtimestamp(timestamp)
-            elif self.datetime_type_default == "画像更新日時":
-                timestamp = os.path.getmtime(filename)
-                the_time = datetime.datetime.fromtimestamp(timestamp)
-            elif self.datetime_type_default == "ワード生成日時":
-                the_time = datetime.datetime.now()
-            else:
-                the_time = datetime.datetime.now()
+            # 日時を取得する。
+            the_time = self.get_datetime(filename)
             if i % page_cells == 0:
                 # ページの最初のセル。
                 if i != 0:
@@ -692,7 +753,7 @@ class WaganaApplication(ttk.Frame):
         for row in table.rows:
             row.height = Mm(int(cell_max_height))
         # 変更内容を保存する。
-        title = convert_title(self.output_name_default, "", 0, the_time)
+        title = convert_title(self.file_title_default, "", 0, the_time)
         title_with_ext = title + ".docx"
         dir = os.path.join(os.path.join(os.environ['USERPROFILE']), 'Desktop')
         filename = dir + "/" + title_with_ext
@@ -721,6 +782,8 @@ class WaganaApplication(ttk.Frame):
         self.retsusuu_default = self.retsusuu.get()
         self.page_size_default = self.page_size.get()
         self.datetime_type_default = self.datetime_type.get()
+        self.image_title_default = self.image_title.get()
+        self.file_title_default = self.file_title.get()
         self.auto_rotation_default = self.auto_rotation.get()
 
         try_int(self.gyousuu_default, "行数")
@@ -732,6 +795,8 @@ class WaganaApplication(ttk.Frame):
         self.retsusuu.set(NOSPEC_if_empty(self.retsusuu_default))
         self.page_size.set(NOSPEC_if_empty(self.page_size_default))
         self.datetime_type.set(NOSPEC_if_empty(self.datetime_type_default))
+        self.image_title.set(NOSPEC_if_empty(self.image_title_default))
+        self.file_title.set(NOSPEC_if_empty(self.file_title_default))
         self.auto_rotation.set(self.auto_rotation_default)
     # 「生成する」ボタンを押した。
     def commandOK(self):
@@ -758,6 +823,9 @@ class WaganaApplication(ttk.Frame):
         self.save_settings()
         # GUIを破棄する。
         root.destroy()
+    # 「>>」ボタンを押した。
+    def commandAdvanced(self):
+        root.geometry("720x390")
     # 「設定の初期化」ボタンを押した。
     def commandResetSettings(self):
         self.reset_settings()
@@ -767,6 +835,8 @@ class WaganaApplication(ttk.Frame):
         self.retsusuu.set(self.retsusuu_default)
         self.page_size.set(self.page_size_default)
         self.datetime_type.set(self.datetime_type_default)
+        self.image_title.set(self.image_title_default)
+        self.file_title.set(self.file_title_default)
         self.auto_rotation.set(self.auto_rotation_default)
         messagebox.showinfo("ワガナ", "設定を初期化しました。")
     # １つ設定を読み込む。
@@ -801,6 +871,8 @@ class WaganaApplication(ttk.Frame):
                 self.retsusuu_default = self.read_settings(soft_key, "retsusuu", self.retsusuu_list, self.retsusuu_default)
                 self.page_size_default = self.read_settings(soft_key, "page_size", self.page_size_list, self.page_size_default)
                 self.datetime_type_default = self.read_settings(soft_key, "datetime_type", self.datetime_type_list, self.datetime_type_default)
+                self.image_title_default = self.read_settings(soft_key, "image_title", self.image_title_list, self.image_title_default)
+                self.file_title_default = self.read_settings(soft_key, "file_title", self.file_title_list, self.file_title_default)
                 self.auto_rotation_default = reg.QueryValueEx(soft_key, "auto_rotation_value")[0] == 'yes'
         except:
             pass
@@ -814,6 +886,8 @@ class WaganaApplication(ttk.Frame):
                 self.write_settings(soft_key, "retsusuu", self.retsusuu_list, self.retsusuu_default)
                 self.write_settings(soft_key, "page_size", self.page_size_list, self.page_size_default)
                 self.write_settings(soft_key, "datetime_type", self.datetime_type_list, self.datetime_type_default)
+                self.write_settings(soft_key, "image_title", self.image_title_list, self.image_title_default)
+                self.write_settings(soft_key, "file_title", self.file_title_list, self.file_title_default)
                 reg.SetValueEx(soft_key, 'auto_rotation_value', 0, reg.REG_SZ, 'yes' if self.auto_rotation_default == '1' else 'no')
                 return True
         except:
@@ -821,8 +895,7 @@ class WaganaApplication(ttk.Frame):
 
 # 主処理。
 root.title('ワガナ（ワードガゾーナラベ） Version 1.1 by 片山博文MZ')
-root.geometry("620x390")
-root.resizable(width=False, height=False)
+root.resizable(False, False)
 try:
     root.iconbitmap('./data/icon.ico')
 except:

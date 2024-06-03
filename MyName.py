@@ -838,6 +838,7 @@ class WaganaApplication(ttk.Frame):
         self.image_title.set(self.image_title_default)
         self.file_title.set(self.file_title_default)
         self.auto_rotation.set(self.auto_rotation_default)
+        self.listbox_on_sel_change()
         messagebox.showinfo("ワガナ", "設定を初期化しました。")
     # １つ設定を読み込む。
     def read_settings(self, key, name, the_list, value):

@@ -823,9 +823,6 @@ class WaganaApplication(ttk.Frame):
         self.save_settings()
         # GUIを破棄する。
         root.destroy()
-    # 「>>」ボタンを押した。
-    def commandAdvanced(self):
-        root.geometry("720x390")
     # 「設定の初期化」ボタンを押した。
     def commandResetSettings(self):
         self.reset_settings()
@@ -895,7 +892,7 @@ class WaganaApplication(ttk.Frame):
             return False
 
 # 主処理。
-root.title('ワガナ（ワードガゾーナラベ） Version 1.1 by 片山博文MZ')
+root.title('ワガナ（ワードガゾーナラベ） Version 1.2 by 片山博文MZ')
 root.resizable(False, False)
 try:
     root.iconbitmap('./data/icon.ico')

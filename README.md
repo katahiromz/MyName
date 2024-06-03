@@ -20,6 +20,13 @@
 
 フリーソフト（MITライセンス）として配布します。このプログラムを使って生じた如何なる損害も当方は責任を負いません。
 
+## 更新履歴
+
+- 2024-05-29 Ver.1.0
+    - 初公開。
+- 2024-XX-YY Ver.1.1
+    - リスト保存に拡張子.txtを追加。
+
 ## 連絡先
 
 Twitter [@katahiromz](https://twitter.com/katahiromz) か電子メール katayama.hirofumi.mz@gmail.com でご連絡下さい。

@@ -329,7 +329,8 @@ class WaganaApplication(ttk.Frame):
     def commandSaveList(self):
         from tkinter import filedialog
         filename = filedialog.asksaveasfilename(initialdir=".", title="テキストファイルの保存先", \
-            filetypes = (("テキストファイル", '*.txt'), ("すべてのファイル", "*.*")))
+            filetypes = (("テキストファイル", '*.txt'), ("すべてのファイル", "*.*")), \
+            defaultextension=".txt")
         items = self.get_file_list()
         try:
             with open(filename, "w") as fp:
@@ -819,11 +820,13 @@ class WaganaApplication(ttk.Frame):
             return False
 
 # 主処理。
-root.title('ワガナ（ワードガゾーナラベ） Version 1.0 by 片山博文MZ')
+root.title('ワガナ（ワードガゾーナラベ） Version 1.1 by 片山博文MZ')
 root.geometry("620x390")
 root.resizable(width=False, height=False)
-root.iconbitmap('./data/icon.ico')
-
+try:
+    root.iconbitmap('./data/icon.ico')
+except:
+    root.iconbitmap('./icon.ico')
 frame = WaganaApplication(root)
 
 def on_closing():

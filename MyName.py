@@ -6,7 +6,7 @@
 import sys, os, datetime
 import winreg as reg
 
-class WaganaError(Exception):
+class MyNameError(Exception):
     def __init__(self, msg):
         self.msg = msg
     def __str(self):
@@ -109,7 +109,7 @@ def try_int(value, field, another_value = "\x7F"):
 
 current_filename = ""
 
-class WaganaApplication(ttk.Frame):
+class MyNameApplication(ttk.Frame):
     def reset_settings(self):
         self.muki_list = [NOSPEC, "縦向き", "横向き"]
         self.muki_default = NOSPEC
@@ -306,7 +306,7 @@ class WaganaApplication(ttk.Frame):
         self.group1.grid(column=0, row=row, columnspan=4)
         row += 1
 
-        self.label_16 = ttk.Label(self.group1, text="並べる画像ファイルのリスト: (ここに順番にファイルをドロップして下さい)", width="", state="normal", )
+        self.label_16 = ttk.Label(self.group1, text="並べる画像ファイルのリスト: (ここに順番にファイルをドロップするか、画像データをCtrl+Vで貼り付けて下さい)", width="", state="normal", )
         self.label_16.pack(side=tk.TOP)
 
         self.listbox_01 = tk.Listbox(self.group1, width=92, height=10, selectmode=tk.EXTENDED, activestyle='none', exportselection=False)
@@ -635,7 +635,7 @@ class WaganaApplication(ttk.Frame):
         page_cells = lines * columns
 
         if len(file_list) <= 0:
-            raise WaganaError("画像ファイルリストが空です。")
+            raise MyNameError("画像ファイルリストが空です。")
 
         # 実際に生成する。
         image_index = 0
@@ -771,7 +771,7 @@ class WaganaApplication(ttk.Frame):
         try:
             document.save(filename)
         except:
-            raise WaganaError("ファイル「" + filename + "」はロックされていたため、保存に失敗しました。")
+            raise MyNameError("ファイル「" + filename + "」はロックされていたため、保存に失敗しました。")
         messagebox.showinfo("ワガナ", "デスクトップにファイル「" + title_with_ext + "」の保存に成功しました。")
         return True
     # 設定を反映する。
@@ -893,19 +893,53 @@ class WaganaApplication(ttk.Frame):
 
 # 主処理。
 root.title('ワガナ（ワード画像並べ） Version 1.2 by 片山博文MZ')
+
+# サイズを変更させない。
 root.resizable(False, False)
+
+# メインアイコンを設定。
 try:
     root.iconbitmap('./data/icon.ico')
 except:
     root.iconbitmap('./icon.ico')
-frame = WaganaApplication(root)
 
+# メインウィンドウを作成。
+frame = MyNameApplication(root)
+
+# 一時ファイルの個数を表す変数。
+iImage = 0
+
+# ウィンドウを閉じたときの処理。
 def on_closing():
+    # 一時ファイルを削除する。
+    global iImage
+    while iImage >= 0:
+        try:
+            fname = os.getenv('TMP') + "\\Image-" + str(iImage) + ".png"
+            os.remove(fname)
+            #print(fname)
+        except:
+            pass
+        iImage -= 1
+    # 終了。
     frame.commandExit()
-
 root.protocol("WM_DELETE_WINDOW", on_closing)
-root.mainloop()
 
-with reg.CreateKeyEx(reg.HKEY_CURRENT_USER, COMPANY_KEY, 0, reg.KEY_WRITE|reg.KEY_WOW64_64KEY) as company_key:
-    with reg.CreateKeyEx(company_key, "Wagana", 0, reg.KEY_WRITE|reg.KEY_WOW64_64KEY) as soft_key:
+# Ctrl+Vを押したときの処理。
+def on_ctrl_v(e):
+    from PIL import Image, ImageGrab
+    try:
+        # クリップボードにある画像を一時ファイルに保存する。
+        clip_img = ImageGrab.grabclipboard()
+        if clip_img:
+            global iImage
+            iImage += 1
+            fname = os.getenv('TMP') + "\\Image-" + str(iImage) + ".png"
+            clip_img.save(fname, "PNG")
+            frame.insert(fname)
+            #print(fname)
+    except:
         pass
+root.bind('<Control-v>', on_ctrl_v)
+
+root.mainloop()

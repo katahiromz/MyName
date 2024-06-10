@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# ワガナ（ワードガゾーナラベ） by 片山博文MZ
+# ワガナ（ワード画像並べ） by 片山博文MZ
 
 # sys, os, datetime
 import sys, os, datetime
@@ -169,7 +169,7 @@ class WaganaApplication(ttk.Frame):
         # 初回起動の場合は説明を表示。
         if (self.first_run):
             messagebox.showinfo("ワガナ",
-                "「ワガナ」（ワードガゾーナラベ）は、複数の画像を並べて、ワード文書ファイルにするソフトです。\n\n" +
+                "「ワガナ」（ワード画像並べ）は、複数の画像を並べて、ワード文書ファイルにするソフトです。\n\n" +
                 "基本操作は、画像ファイルをリストに追加して「ワード生成」ボタンを" +
                 "押すだけです。完成したワードファイルはデスクトップに作成されます。")
     # ドラッグ＆ドロップされた。
@@ -892,7 +892,7 @@ class WaganaApplication(ttk.Frame):
             return False
 
 # 主処理。
-root.title('ワガナ（ワードガゾーナラベ） Version 1.2 by 片山博文MZ')
+root.title('ワガナ（ワード画像並べ） Version 1.2 by 片山博文MZ')
 root.resizable(False, False)
 try:
     root.iconbitmap('./data/icon.ico')

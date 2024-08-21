@@ -12,37 +12,13 @@
    inkscape:export-ydpi="96.000008"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:cc="http://creativecommons.org/ns#"
    xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
-     id="defs2">
-    <linearGradient
-       inkscape:collect="always"
-       id="linearGradient843">
-      <stop
-         style="stop-color:#ffb380;stop-opacity:1;"
-         offset="0"
-         id="stop839" />
-      <stop
-         style="stop-color:#ffffff;stop-opacity:1"
-         offset="1"
-         id="stop841" />
-    </linearGradient>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient843"
-       id="linearGradient845"
-       x1="40.82143"
-       y1="67.73333"
-       x2="40.82143"
-       y2="4.6999439e-16"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.05945582,0,0,0.05945594,0.10309635,0.1030922)" />
-  </defs>
+     id="defs2" />
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -51,8 +27,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.9195959"
-     inkscape:cx="42.931483"
-     inkscape:cy="0.31567267"
+     inkscape:cx="47.098363"
+     inkscape:cy="25.190679"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -84,40 +60,27 @@
      inkscape:label="レイヤー 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <rect
-       style="fill:url(#linearGradient845);fill-opacity:1;stroke:#ff0000;stroke-width:0.206193;paint-order:fill markers stroke;stop-color:#000000"
-       id="rect10"
-       width="4.0271406"
-       height="4.0271487"
-       x="0.10309636"
-       y="0.10309231" />
     <g
-       id="g1"
-       transform="matrix(1.8678616,0,0,1.8678616,-1.8135587,-0.53536543)">
-      <text
-         id="text14-6"
-         y="1.9415293"
-         x="2.10782"
-         style="font-style:normal;font-weight:normal;font-size:1.51018px;line-height:0.95;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.471931;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         xml:space="preserve"
-         transform="scale(0.99999899)"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.51018px;line-height:0.95;font-family:TT-JTCウインZ10P;-inkscape-font-specification:'TT-JTCウインZ10P Bold';text-align:center;text-anchor:middle;fill:#ffffff;stroke:#000000;stroke-width:0.471931;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           y="1.9415293"
-           x="2.10782"
-           sodipodi:role="line"
-           id="tspan4">ワ</tspan></text>
-      <text
-         id="text14-6-6"
-         y="1.9415293"
-         x="2.10782"
-         style="font-style:normal;font-weight:normal;font-size:1.51018px;line-height:0.95;font-family:sans-serif;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.251696;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-         xml:space="preserve"
-         transform="scale(0.99999899)"><tspan
-           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:1.51018px;line-height:0.95;font-family:TT-JTCウインZ10P;-inkscape-font-specification:'TT-JTCウインZ10P Bold';text-align:center;text-anchor:middle;fill:#ffffff;stroke:none;stroke-width:0.251696;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-           y="1.9415293"
-           x="2.10782"
-           sodipodi:role="line"
-           id="tspan3">ワ</tspan></text>
+       id="g3"
+       transform="scale(0.06249998)">
+      <rect
+         style="fill:#1e00e2;fill-opacity:1;stroke:#000000;stroke-width:7.1049;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+         id="rect1"
+         width="60.628445"
+         height="60.628433"
+         x="3.5524416"
+         y="3.5524492" />
     </g>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;line-height:0.95;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;stroke-width:0.264583"
+       x="2.1277792"
+       y="3.3025291"
+       id="text1"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;line-height:0.95;font-family:RFPG2サンセリフ-U;-inkscape-font-specification:RFPG2サンセリフ-U;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.264583"
+         x="2.1277792"
+         y="3.3025291"
+         id="tspan2">ワ</tspan></text>
   </g>
 </svg>

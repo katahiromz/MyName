@@ -892,7 +892,7 @@ class MyNameApplication(ttk.Frame):
             return False
 
 # 主処理。
-root.title('ワガナ（ワード画像並べ） Version 1.2 by 片山博文MZ')
+root.title('ワガナ (ワード画像並べ) Ver.1.3 by 片山博文MZ')
 
 # サイズを変更させない。
 root.resizable(False, False)
